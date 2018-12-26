@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Simple Todo List</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+    crossorigin="anonymous">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Roboto, Arial, sans-serif;
+    }
+
+    body {
+      padding: 1rem;
+      margin: 0 auto;
+      max-width: 640px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    h1 {
+      margin: 0 auto 1rem;
+      font-size: 2.5rem;
+      font-weight: normal;
+    }
+
+    input[type="text"] {
+      display: block;
+      width: 100%;
+      padding: .5rem 1rem;
+      border-radius: .2rem;
+      border: 1px solid #ddddff;
+      outline: 0;
+      font-size: 1rem;
+      margin: 0 auto 1rem;
+    }
+
+    button {
+      padding: .5rem 1rem;
+      border-radius: .2rem;
+      border: 0;
+      background: #6666ff;
+      color: #ffffff;
+      outline: 0;
+      font-size: 1rem;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    form {
+      margin-bottom: 1rem;
+      background: #eeeeff;
+      padding: 1rem;
+      border-radius: .2rem;
+      border: 1px solid #ddddff;
+    }
+
+    .item {
+      padding: .5rem 1rem;
+      border-radius: .2rem;
+      background: #eeeeff;
+      margin-bottom: .5rem;
+      border: 1px solid #ddddff;
+      overflow: hidden;
+      transition: all ease-in-out .3s;
+    }
+
+    .item:hover {
+      background: #ffeeee;
+      border-color: #ffdddd;
+    }
+
+    .item:hover .delete-button {
+      opacity: 1;
+    }
+
+    .delete-button {
+      transition: all ease-in-out .3s;
+      opacity: 0;
+      float: right;
+      padding: 0;
+      border-radius: 0;
+      border: 0;
+      background: none;
+      color: #ff6666;
+      outline: 0;
+      font-size: 1rem;
+      cursor: pointer;
+      text-transform: none;
+      margin-left: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Simple Todo List</h1>
+  <form id="todoForm">
+    <input type="text" placeholder="Type todo name" id="todoInput">
+    <button id="todoButton">Add</button>
+  </form>
+  <div id="todoList"></div>
+
+  <script>
+    (function () {
+      const todoForm = document.getElementById('todoForm');
+      const todoInput = document.getElementById('todoInput');
+      const todoButton = document.getElementById('todoButton');
+      const todoList = document.getElementById('todoList');
+
+      document.addEventListener('DOMContentLoaded', renderList);
+      todoForm.addEventListener('submit', submitForm);
+
+      function submitForm(e) {
+        e.preventDefault();
+        addItem();
+      }
+
+      function addItem() {
+        const inputValue = todoInput.value.split('').map(letter => letter === ' ' ? '_' : letter).join('');
+        // const inputValue = todoInput.value.split('').filter(letter => letter !== ' ').join('_');
+
+        if (todoInput.value === '') {
+          alert('Type todo name');
+          return;
+        }
+
+        localStorage.setItem(inputValue, inputValue);
+        todoInput.value = '';
+        renderList();
+      }
+
+      function renderList() {
+        clearList();
+
+        const items = Object.keys(localStorage);
+
+        if (items.length) {
+          Object.keys(localStorage).map(item => {
+            const newItem = document.createElement('div');
+            const newItemDeleteButton = document.createElement('button');
+
+            newItemDeleteButton.setAttribute('id', item);
+            newItemDeleteButton.classList.add('delete-button');
+            newItemDeleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+
+            newItem.innerText = item;
+            newItem.appendChild(newItemDeleteButton);
+            newItem.classList.add('item');
+            todoList.appendChild(newItem);
+
+            newItemDeleteButton.addEventListener('click', removeItem);
+          });
+        } else {
+          const notification = document.createElement('div');
+
+          notification.append('There are no items.');
+          notification.classList.add('notification');
+          todoList.appendChild(notification);
+        }
+      }
+
+      function clearList() {
+        todoList.innerHTML = '';
+      }
+
+      function removeItem(e) {
+        const item = e.target.parentNode.id;
+        localStorage.removeItem(item);
+        renderList();
+      }
+    }());
+  </script>
+</body>
+
+</html>
